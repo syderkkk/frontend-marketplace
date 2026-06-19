@@ -1,26 +1,142 @@
 @import "tailwindcss";
 
-:root {
-  --background: #ffffff;
-  --foreground: #171717;
+/* ──────────────────────────────────────────────────
+   VIEW TRANSITIONS (page-to-page, iOS feel)
+────────────────────────────────────────────────── */
+@view-transition {
+    navigation: auto;
 }
 
-@theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
+::view-transition-old(root) {
+    animation: vt-out 0.18s ease-in both;
+}
+::view-transition-new(root) {
+    animation: vt-in 0.28s cubic-bezier(0.22, 1, 0.36, 1) both;
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
+@keyframes vt-out {
+    to { opacity: 0; transform: translateY(-4px) scale(0.99); }
+}
+@keyframes vt-in {
+    from { opacity: 0; transform: translateY(14px); }
+}
+
+/* ──────────────────────────────────────────────────
+   SHIMMER SKELETON
+────────────────────────────────────────────────── */
+@keyframes shimmer {
+    0%   { background-position: -600px 0; }
+    100% { background-position:  600px 0; }
+}
+
+.shimmer {
+    background: linear-gradient(
+        90deg,
+        #f1f5f9 25%,
+        #e2e8f0 50%,
+        #f1f5f9 75%
+    );
+    background-size: 1200px 100%;
+    animation: shimmer 1.4s ease-in-out infinite;
+}
+
+/* ──────────────────────────────────────────────────
+   FADE-IN-UP — elementos al aparecer
+────────────────────────────────────────────────── */
+@keyframes fade-in-up {
+    from { opacity: 0; transform: translateY(14px); }
+    to   { opacity: 1; transform: translateY(0); }
+}
+
+.animate-in {
+    animation: fade-in-up 0.38s cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+
+/* Stagger para grid de productos */
+.stagger > * {
+    opacity: 0;
+    animation: fade-in-up 0.38s cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+.stagger > *:nth-child(1)  { animation-delay:   0ms; }
+.stagger > *:nth-child(2)  { animation-delay:  50ms; }
+.stagger > *:nth-child(3)  { animation-delay: 100ms; }
+.stagger > *:nth-child(4)  { animation-delay: 150ms; }
+.stagger > *:nth-child(5)  { animation-delay: 200ms; }
+.stagger > *:nth-child(6)  { animation-delay: 250ms; }
+.stagger > *:nth-child(7)  { animation-delay: 300ms; }
+.stagger > *:nth-child(8)  { animation-delay: 350ms; }
+.stagger > *:nth-child(9)  { animation-delay: 400ms; }
+
+/* ──────────────────────────────────────────────────
+   TOAST NOTIFICATION
+────────────────────────────────────────────────── */
+@keyframes toast-in {
+    from { opacity: 0; transform: translateY(16px) scale(0.95); }
+    to   { opacity: 1; transform: translateY(0) scale(1); }
+}
+@keyframes toast-out {
+    to   { opacity: 0; transform: translateY(8px) scale(0.95); }
+}
+
+.toast-in  { animation: toast-in  0.3s cubic-bezier(0.22, 1, 0.36, 1) both; }
+.toast-out { animation: toast-out 0.2s ease-in both; }
+
+/* ──────────────────────────────────────────────────
+   CARD LIFT — hover en tarjetas
+────────────────────────────────────────────────── */
+.card-lift {
+    transition: transform 0.22s cubic-bezier(0.22, 1, 0.36, 1),
+                box-shadow 0.22s cubic-bezier(0.22, 1, 0.36, 1),
+                border-color 0.22s ease;
+}
+.card-lift:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 12px 28px -6px rgba(0, 0, 0, 0.09),
+                0 4px 10px -3px rgba(0, 0, 0, 0.05);
+    border-color: #d4d4d8;
+}
+
+/* ──────────────────────────────────────────────────
+   BUTTON PRESS
+────────────────────────────────────────────────── */
+.btn-press {
+    transition: all 0.12s cubic-bezier(0.4, 0, 0.2, 1);
+}
+.btn-press:active {
+    transform: scale(0.95);
+}
+
+/* ──────────────────────────────────────────────────
+   PILL FILTER (category buttons)
+────────────────────────────────────────────────── */
+.pill {
+    transition: all 0.18s cubic-bezier(0.22, 1, 0.36, 1);
+}
+.pill:hover  { transform: translateY(-1px); }
+.pill:active { transform: scale(0.95); }
+
+/* ──────────────────────────────────────────────────
+   BASE
+────────────────────────────────────────────────── */
+html {
+    scroll-behavior: smooth;
 }
 
 body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+    font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Display', 'Segoe UI',
+                 system-ui, sans-serif;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    background: #f8fafc;
+    color: #0f172a;
+}
+
+::selection {
+    background: #e0e7ff;
+    color: #3730a3;
+}
+
+/* Input focus ring */
+input:focus, textarea:focus, select:focus {
+    outline: none;
 }

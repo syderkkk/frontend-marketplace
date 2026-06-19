@@ -1,36 +1,118 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# Frontend — Marketplace
 
-## Getting Started
+Aplicación web construida con **Next.js 16** (App Router) + **TypeScript** + **Tailwind CSS v4**. Consume la API del backend, implementa autenticación con JWT y control de acceso por roles mediante proxy (middleware).
 
-First, run the development server:
+---
 
-```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
+## Stack
+
+| Tecnología | Uso |
+|---|---|
+| Next.js 16 (App Router) | Framework React con SSR/SSG |
+| TypeScript | Tipado estático |
+| Tailwind CSS v4 | Estilos utilitarios |
+| CSS View Transitions API | Animaciones entre páginas |
+
+---
+
+## Estructura
+
+```
+src/
+├── app/
+│   ├── (auth)/              # Grupo de rutas sin navbar
+│   │   ├── layout.tsx
+│   │   ├── login/page.tsx
+│   │   └── register/page.tsx
+│   ├── (shop)/              # Grupo de rutas con navbar
+│   │   ├── layout.tsx
+│   │   ├── loading.tsx      # Skeleton SSR
+│   │   ├── page.tsx         # Catálogo (SSR + SSG categorías)
+│   │   ├── admin/page.tsx   # Panel de administración (ADMIN)
+│   │   └── products/[id]/page.tsx
+│   ├── globals.css          # Animaciones, shimmer, view transitions
+│   ├── layout.tsx           # Root layout (html + body)
+│   └── not-found.tsx
+├── components/
+│   ├── Navbar.tsx           # Sticky, glassmorphism, role-aware
+│   └── CategoryFilter.tsx   # Client component, filtro por URL param
+├── lib/
+│   └── auth.ts              # saveAuth, clearAuth, getToken, getAuthHeaders
+├── types/
+│   └── product.ts           # Interfaces Product, Category, ApiResponse
+└── proxy.ts                 # Protección de rutas por cookie (Next.js 16)
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+---
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+## Variables de entorno
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+Crea un archivo `.env.local` en la raíz:
 
-## Learn More
+```env
+NEXT_PUBLIC_API_URL=http://localhost:3001/api
+```
 
-To learn more about Next.js, take a look at the following resources:
+En producción (Vercel), apuntar a la URL del backend en Render:
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+```env
+NEXT_PUBLIC_API_URL=https://tu-backend.onrender.com/api
+```
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+---
 
-## Deploy on Vercel
+## Instalación y ejecución
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+```bash
+npm install
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+# Desarrollo
+npm run dev
+
+# Build de producción
+npm run build
+npm start
+```
+
+---
+
+## Páginas y acceso por rol
+
+| Ruta | CUSTOMER | ADMIN | Sin sesión |
+|---|---|---|---|
+| `/login` | Redirige a `/` | Redirige a `/` | ✅ |
+| `/register` | Redirige a `/` | Redirige a `/` | ✅ |
+| `/` | ✅ | ✅ | Redirige a `/login` |
+| `/products/[id]` | ✅ | ✅ | Redirige a `/login` |
+| `/admin` | Redirige a `/` | ✅ | Redirige a `/login` |
+
+La protección se aplica en `proxy.ts` leyendo la cookie `userRole` (servidor) y en `Navbar.tsx` leyendo `localStorage` (cliente).
+
+---
+
+## Credenciales de prueba
+
+| Rol | Email | Contraseña |
+|---|---|---|
+| ADMIN | `admin@marketplace.com` | `admin123` |
+| CUSTOMER | `cliente@marketplace.com` | `cliente123` |
+
+---
+
+## Características técnicas
+
+- **SSR**: El catálogo (`/`) se renderiza en servidor con `cache: 'no-store'`
+- **SSG**: Las categorías se revalidan cada 60 segundos (`next: { revalidate: 60 }`)
+- **Suspense + Skeletons**: Cada sección tiene un fallback shimmer animado mientras carga
+- **View Transitions**: Animaciones fluidas entre páginas vía CSS View Transitions API
+- **Animaciones**: `fade-in-up` con stagger en la grilla, `card-lift` en hover, `toast-in` en notificaciones
+- **Auth dual**: JWT en `localStorage` para llamadas a la API + cookie `userRole` para el proxy de Next.js
+
+---
+
+## Despliegue en Vercel
+
+1. Conectar el repositorio a Vercel
+2. Configurar la variable de entorno `NEXT_PUBLIC_API_URL` con la URL del backend en Render
+3. Vercel detecta Next.js automáticamente — sin configuración adicional
+4. Actualizar `FRONTEND_URL` en el `.env` del backend con la URL de Vercel para el CORS
