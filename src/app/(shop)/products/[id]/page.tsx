@@ -2,6 +2,7 @@ import Link from 'next/link';
 import { notFound } from 'next/navigation';
 import { Product, ApiResponse } from '@/types/product';
 import AddToCartButton from '@/components/AddToCartButton';
+import SaveButton from '@/components/SaveButton';
 
 const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3001/api';
 
@@ -97,9 +98,7 @@ export default async function ProductDetailPage({
                                 precio={Number(product.precio)}
                                 imageUrl={product.imageUrl}
                             />
-                            <button className="btn-press w-full bg-white text-zinc-700 py-3 rounded-xl text-sm font-medium border border-zinc-200 hover:bg-zinc-50 transition-colors">
-                                Guardar para después
-                            </button>
+                            <SaveButton id={product.id} />
                         </div>
 
                         <div className="mt-6 pt-5 border-t border-zinc-100">
