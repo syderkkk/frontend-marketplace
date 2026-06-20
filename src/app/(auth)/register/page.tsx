@@ -39,15 +39,18 @@ export default function RegisterPage() {
 
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
-        if (form.password !== form.confirmPassword) return setError('Las contraseñas no coinciden');
-        if (form.password.length < 6) return setError('Mínimo 6 caracteres');
+        const email = form.email.trim();
+        const password = form.password.trim();
+        const confirmPassword = form.confirmPassword.trim();
+        if (password !== confirmPassword) return setError('Las contraseñas no coinciden');
+        if (password.length < 6) return setError('Mínimo 6 caracteres');
         setLoading(true);
         setError('');
         try {
             const res = await fetch(`${API_URL}/auth/register`, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ email: form.email, password: form.password, role: form.role }),
+                body: JSON.stringify({ email, password, role: form.role }),
             });
             const data = await res.json();
             if (data.success) {
@@ -149,6 +152,7 @@ export default function RegisterPage() {
                                 placeholder="tu@email.com"
                                 value={form.email}
                                 onChange={e => setForm({ ...form, email: e.target.value })}
+                                onBlur={e => setForm(f => ({ ...f, email: e.target.value.trim() }))}
                                 className="w-full px-4 py-3 border border-zinc-200 rounded-xl text-sm text-zinc-900 placeholder-zinc-400 focus:ring-2 focus:ring-zinc-900/10 focus:border-zinc-400 transition-all bg-zinc-50"
                             />
                         </div>

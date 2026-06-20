@@ -17,11 +17,12 @@ export default function LoginPage() {
         e.preventDefault();
         setLoading(true);
         setError('');
+        const trimmed = { email: form.email.trim(), password: form.password.trim() };
         try {
             const res = await fetch(`${API_URL}/auth/login`, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify(form),
+                body: JSON.stringify(trimmed),
             });
             const data = await res.json();
             if (data.success) {
@@ -116,6 +117,7 @@ export default function LoginPage() {
                                 placeholder="tu@email.com"
                                 value={form.email}
                                 onChange={e => setForm({ ...form, email: e.target.value })}
+                                onBlur={e => setForm(f => ({ ...f, email: e.target.value.trim() }))}
                                 className="w-full px-4 py-3 border border-zinc-200 rounded-xl text-sm text-zinc-900 placeholder-zinc-400 focus:ring-2 focus:ring-zinc-900/10 focus:border-zinc-400 transition-all bg-zinc-50"
                             />
                         </div>
