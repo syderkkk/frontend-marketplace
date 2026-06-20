@@ -1,27 +1,18 @@
 'use client';
 
 import { useEffect, useState } from 'react';
+import { isSaved, toggleSaved, SavedProduct } from '@/lib/saved';
 
-const KEY = 'saved_products';
+type Props = SavedProduct;
 
-function getSaved(): number[] {
-    try { return JSON.parse(localStorage.getItem(KEY) || '[]'); } catch { return []; }
-}
-
-export default function SaveButton({ id }: { id: number }) {
+export default function SaveButton({ id, nombre, precio, imageUrl, categoryName }: Props) {
     const [saved, setSaved] = useState(false);
 
-    useEffect(() => {
-        setSaved(getSaved().includes(id));
-    }, [id]);
+    useEffect(() => { setSaved(isSaved(id)); }, [id]);
 
     const toggle = () => {
-        const current = getSaved();
-        const next = current.includes(id)
-            ? current.filter(x => x !== id)
-            : [...current, id];
-        localStorage.setItem(KEY, JSON.stringify(next));
-        setSaved(next.includes(id));
+        const now = toggleSaved({ id, nombre, precio, imageUrl, categoryName });
+        setSaved(now);
     };
 
     return (
@@ -34,7 +25,7 @@ export default function SaveButton({ id }: { id: number }) {
             }`}
         >
             <svg
-                className="w-4 h-4 transition-all"
+                className="w-4 h-4"
                 fill={saved ? 'currentColor' : 'none'}
                 viewBox="0 0 24 24"
                 stroke="currentColor"

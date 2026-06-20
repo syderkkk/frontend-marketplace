@@ -2,6 +2,7 @@ import Link from 'next/link';
 import { Suspense } from 'react';
 import { Product, Category, ApiResponse } from '@/types/product';
 import CategoryFilter from '@/components/CategoryFilter';
+import SearchBar from '@/components/SearchBar';
 
 const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3001/api';
 
@@ -73,8 +74,12 @@ function ProductImage({ product }: { product: Product }) {
     );
 }
 
-async function ProductsGrid({ categoryId }: { categoryId?: string }) {
-    const products = await getProducts(categoryId);
+async function ProductsGrid({ categoryId, q }: { categoryId?: string; q?: string }) {
+    let products = await getProducts(categoryId);
+    if (q) {
+        const term = q.toLowerCase();
+        products = products.filter(p => p.nombre.toLowerCase().includes(term));
+    }
 
     if (!products.length) {
         return (
@@ -127,16 +132,21 @@ async function ProductsGrid({ categoryId }: { categoryId?: string }) {
 export default async function HomePage({
     searchParams,
 }: {
-    searchParams: Promise<{ categoryId?: string }>;
+    searchParams: Promise<{ categoryId?: string; q?: string }>;
 }) {
-    const { categoryId } = await searchParams;
+    const { categoryId, q } = await searchParams;
     const categories = await getCategories();
 
     return (
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10">
-            <div className="mb-8 animate-in">
-                <h1 className="text-[28px] font-bold text-zinc-900 tracking-tight">Catálogo</h1>
-                <p className="text-zinc-400 mt-1 text-sm">Descubre nuestra selección de productos</p>
+            <div className="mb-8 animate-in flex flex-col sm:flex-row sm:items-end sm:justify-between gap-4">
+                <div>
+                    <h1 className="text-[28px] font-bold text-zinc-900 tracking-tight">Catálogo</h1>
+                    <p className="text-zinc-400 mt-1 text-sm">Descubre nuestra selección de productos</p>
+                </div>
+                <Suspense fallback={null}>
+                    <SearchBar />
+                </Suspense>
             </div>
 
             <div className="mb-7">
@@ -147,7 +157,7 @@ export default async function HomePage({
 
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5">
                 <Suspense fallback={<>{Array.from({ length: 6 }).map((_, i) => <CardSkeleton key={i} />)}</>}>
-                    <ProductsGrid categoryId={categoryId} />
+                    <ProductsGrid categoryId={categoryId} q={q} />
                 </Suspense>
             </div>
         </div>

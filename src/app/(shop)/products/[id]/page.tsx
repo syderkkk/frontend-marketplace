@@ -98,7 +98,13 @@ export default async function ProductDetailPage({
                                 precio={Number(product.precio)}
                                 imageUrl={product.imageUrl}
                             />
-                            <SaveButton id={product.id} />
+                            <SaveButton
+                                id={product.id}
+                                nombre={product.nombre}
+                                precio={Number(product.precio)}
+                                imageUrl={product.imageUrl}
+                                categoryName={product.category?.name}
+                            />
                         </div>
 
                         <div className="mt-6 pt-5 border-t border-zinc-100">
