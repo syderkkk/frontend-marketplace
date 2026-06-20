@@ -6,13 +6,15 @@ export interface CartItem {
     quantity: number;
 }
 
-const KEY = 'cart_items';
+function key(): string {
+    try { return `cart_${localStorage.getItem('userEmail') || 'guest'}`; } catch { return 'cart_guest'; }
+}
 
 export function loadCart(): CartItem[] {
     if (typeof window === 'undefined') return [];
-    try { return JSON.parse(localStorage.getItem(KEY) || '[]'); } catch { return []; }
+    try { return JSON.parse(localStorage.getItem(key()) || '[]'); } catch { return []; }
 }
 
 export function saveCart(items: CartItem[]) {
-    localStorage.setItem(KEY, JSON.stringify(items));
+    localStorage.setItem(key(), JSON.stringify(items));
 }
