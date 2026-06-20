@@ -4,6 +4,7 @@ import Link from 'next/link';
 import { useRouter, usePathname } from 'next/navigation';
 import { useEffect, useState } from 'react';
 import { clearAuth, getUserEmail, getUserRole } from '@/lib/auth';
+import { useCart } from '@/context/CartContext';
 
 export default function Navbar() {
     const router = useRouter();
@@ -11,6 +12,7 @@ export default function Navbar() {
     const [email, setEmail] = useState<string | null>(null);
     const [role, setRole] = useState<string | null>(null);
     const [scrolled, setScrolled] = useState(false);
+    const { count, openCart } = useCart();
 
     useEffect(() => {
         setEmail(getUserEmail());
@@ -42,9 +44,7 @@ export default function Navbar() {
                             <path strokeLinecap="round" strokeLinejoin="round" d="M15.75 10.5V6a3.75 3.75 0 10-7.5 0v4.5m11.356-1.993l1.263 12c.07.665-.45 1.243-1.119 1.243H4.25a1.125 1.125 0 01-1.12-1.243l1.264-12A1.125 1.125 0 015.513 7.5h12.974c.576 0 1.059.435 1.119 1.007z" />
                         </svg>
                     </div>
-                    <span className="font-semibold text-zinc-900 text-sm tracking-tight">
-                        ProductStore
-                    </span>
+                    <span className="font-semibold text-zinc-900 text-sm tracking-tight">ProductStore</span>
                 </Link>
 
                 {/* Nav links */}
@@ -52,9 +52,7 @@ export default function Navbar() {
                     <Link
                         href="/"
                         className={`px-3 py-1.5 rounded-lg text-sm font-medium transition-all duration-150 ${
-                            active('/')
-                                ? 'bg-zinc-100 text-zinc-900'
-                                : 'text-zinc-500 hover:text-zinc-900 hover:bg-zinc-50'
+                            active('/') ? 'bg-zinc-100 text-zinc-900' : 'text-zinc-500 hover:text-zinc-900 hover:bg-zinc-50'
                         }`}
                     >
                         Catálogo
@@ -64,17 +62,30 @@ export default function Navbar() {
                         <Link
                             href="/admin"
                             className={`px-3 py-1.5 rounded-lg text-sm font-medium transition-all duration-150 ${
-                                active('/admin')
-                                    ? 'bg-zinc-100 text-zinc-900'
-                                    : 'text-zinc-500 hover:text-zinc-900 hover:bg-zinc-50'
+                                active('/admin') ? 'bg-zinc-100 text-zinc-900' : 'text-zinc-500 hover:text-zinc-900 hover:bg-zinc-50'
                             }`}
                         >
                             Admin
                         </Link>
                     )}
 
+                    {/* Cart button */}
+                    <button
+                        onClick={openCart}
+                        className="relative p-2 text-zinc-500 hover:text-zinc-900 hover:bg-zinc-50 rounded-lg transition-colors ml-0.5"
+                    >
+                        <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.8}>
+                            <path strokeLinecap="round" strokeLinejoin="round" d="M2.25 3h1.386c.51 0 .955.343 1.087.835l.383 1.437M7.5 14.25a3 3 0 00-3 3h15.75m-12.75-3h11.218c1.121-2.3 2.1-4.684 2.924-7.138a60.114 60.114 0 00-16.536-1.84M7.5 14.25L5.106 5.272M6 20.25a.75.75 0 11-1.5 0 .75.75 0 011.5 0zm12.75 0a.75.75 0 11-1.5 0 .75.75 0 011.5 0z" />
+                        </svg>
+                        {count > 0 && (
+                            <span className="absolute -top-0.5 -right-0.5 min-w-[18px] h-[18px] bg-zinc-900 text-white text-[10px] font-bold rounded-full flex items-center justify-center px-1 animate-in">
+                                {count > 99 ? '99+' : count}
+                            </span>
+                        )}
+                    </button>
+
                     {email ? (
-                        <div className="flex items-center gap-2 ml-2 pl-3 border-l border-zinc-200">
+                        <div className="flex items-center gap-2 ml-1 pl-3 border-l border-zinc-200">
                             <div className="w-7 h-7 rounded-full bg-zinc-100 flex items-center justify-center shrink-0">
                                 <span className="text-xs font-bold text-zinc-700">
                                     {email.charAt(0).toUpperCase()}
